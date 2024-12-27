@@ -3,18 +3,19 @@ from transformers import pipeline
 from PIL import Image
 from sentence_transformers import SentenceTransformer, util
 import easyocr
+import numpy as np
 
 # Load Hugging Face token from secrets
 hf_token = st.secrets["hf_token"]
 
 # Initialize EasyOCR Reader
-ocr_reader = easyocr.Reader(['en'])  # Add more languages if needed
+ocr_reader = easyocr.Reader(['en'])
 
 # Load NLP pipeline
 nlp_pipeline = pipeline(
-    "text-classification", 
-    model="google-bert/bert-base-uncased", 
-    tokenizer="google-bert/bert-base-uncased", 
+    "text-classification",
+    model="google-bert/bert-base-uncased",
+    tokenizer="google-bert/bert-base-uncased",
     use_auth_token=hf_token
 )
 
@@ -33,9 +34,10 @@ if uploaded_image is not None:
     image = Image.open(uploaded_image)
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Extract text using EasyOCR
-    extracted_text = " ".join(ocr_reader.readtext(uploaded_image, detail=0))
-    
+    # Convert the image to a format supported by EasyOCR
+    image_np = np.array(image)  # Convert PIL image to numpy array
+    extracted_text = " ".join(ocr_reader.readtext(image_np, detail=0))
+
     # Display the extracted text
     st.subheader("Extracted Text from Image:")
     st.write(extracted_text)
