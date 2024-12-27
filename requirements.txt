@@ -1,6 +1,8 @@
+opencv-python-headless
+numpy
 streamlit
 transformers
-torch
 sentence-transformers
 easyocr
 Pillow
+torch
