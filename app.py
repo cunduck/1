@@ -4,6 +4,7 @@ from PIL import Image
 from sentence_transformers import SentenceTransformer, util
 import easyocr
 import numpy as np
+import cv2  # OpenCV untuk memastikan format kompatibel dengan EasyOCR
 
 # Load Hugging Face token from secrets
 hf_token = st.secrets["hf_token"]
@@ -36,6 +37,12 @@ if uploaded_image is not None:
 
     # Convert the image to a format supported by EasyOCR
     image_np = np.array(image)  # Convert PIL image to numpy array
+    if image_np.ndim == 2:  # If grayscale, convert to 3-channel
+        image_np = cv2.cvtColor(image_np, cv2.COLOR_GRAY2BGR)
+    elif image_np.shape[2] == 4:  # If RGBA, convert to RGB
+        image_np = cv2.cvtColor(image_np, cv2.COLOR_RGBA2RGB)
+
+    # Use EasyOCR to extract text
     extracted_text = " ".join(ocr_reader.readtext(image_np, detail=0))
 
     # Display the extracted text
