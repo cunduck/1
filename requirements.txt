@@ -2,5 +2,5 @@ streamlit
 transformers
 torch
 sentence-transformers
-pytesseract
+easyocr
 Pillow
