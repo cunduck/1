@@ -1,16 +1,22 @@
 import streamlit as st
 from transformers import pipeline
-import pytesseract
 from PIL import Image
-import os
 from sentence_transformers import SentenceTransformer, util
+import easyocr
 
 # Load Hugging Face token from secrets
 hf_token = st.secrets["hf_token"]
 
-# Load OCR model, NLP pipeline, and semantic search model
-ocr_model = pytesseract
-nlp_pipeline = pipeline("text-classification", model="google-bert/bert-base-uncased", tokenizer="google-bert/bert-base-uncased", use_auth_token=hf_token)
+# Initialize EasyOCR Reader
+ocr_reader = easyocr.Reader(['en'])  # Add more languages if needed
+
+# Load NLP pipeline
+nlp_pipeline = pipeline(
+    "text-classification", 
+    model="google-bert/bert-base-uncased", 
+    tokenizer="google-bert/bert-base-uncased", 
+    use_auth_token=hf_token
+)
 
 # Semantic search model
 semantic_model = SentenceTransformer('sentence-transformers/bert-base-nli-mean-tokens')
@@ -23,9 +29,12 @@ st.subheader("Upload an Image for Text Extraction (OCR)")
 uploaded_image = st.file_uploader("Choose an image", type=["png", "jpg", "jpeg"])
 
 if uploaded_image is not None:
-    # Use OCR to extract text from the image
+    # Display the uploaded image
     image = Image.open(uploaded_image)
-    extracted_text = ocr_model.image_to_string(image)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+
+    # Extract text using EasyOCR
+    extracted_text = " ".join(ocr_reader.readtext(uploaded_image, detail=0))
     
     # Display the extracted text
     st.subheader("Extracted Text from Image:")
